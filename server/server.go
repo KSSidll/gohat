@@ -36,6 +36,8 @@ func Serve(port string) {
 		bookName := r.Form.Get("book-name")
 
 		db.InsertBook(database.BookInsert{ Name: bookName })
+
+		w.ResponseWriter.Header().Add("HX-Trigger", "newBook")
 	}, true)
 
 	router.GET("/book/all", func(w *routing.ResponseWriter, r *http.Request) {
@@ -54,6 +56,28 @@ func Serve(port string) {
 		}
 
 		db.DeleteBook(database.BookDelete{ ID: id })
+
+		w.ResponseWriter.Header().Add("HX-Trigger", "deleteBook")
+	}, true)
+
+	router.PUT("/book/:id", func(w *routing.ResponseWriter, r *http.Request) {
+		id_str :=   r.Context().Value(routing.ContextKey("id")).(string)
+
+		id, err := strconv.ParseInt(id_str, 10, 64)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "Failed to parse form data", http.StatusBadRequest)
+			return
+		}
+
+		bookName := r.Form.Get("book-name")
+
+		db.UpdateBook(database.Book{ ID: id, Name: bookName })
+
+		w.ResponseWriter.Header().Add("HX-Trigger", "updateBook")
 	}, true)
 
 	l, err := net.Listen("tcp", ":" + port)

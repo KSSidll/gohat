@@ -1,8 +1,9 @@
 package client
 
 import (
-	"github.com/KSSidll/gohat/database"
 	"strconv"
+
+	"github.com/KSSidll/gohat/database"
 )
 
 templ PageSkeleton(title string, body templ.Component) {
@@ -29,7 +30,7 @@ templ IndexContent () {
 	@BookInsertFormComponent()
 	<br/>
 
-	<div hx-get="/book/all" hx-trigger="every 2s"></div>
+	<div hx-get="/book/all" hx-trigger="load, newBook from:body, updateBook from:body, deleteBook from:body"></div>
 }
 
 templ BookTableComponent (books []database.Book) {
@@ -43,9 +44,14 @@ templ BookTableComponent (books []database.Book) {
 			<tr>
 				<td>{ strconv.FormatInt(book.ID, 10) }</td>
 				<td>{ book.Name }</td>
-				<td>Edit</td>
 				<td>
-					<button type="button" hx-delete={"/book/" + strconv.FormatInt(book.ID, 10) } hx-swap="delete" hx-target="closest tr">Delete</button>
+					<form hx-put={"/book/" + strconv.FormatInt(book.ID, 10)} hx-swap="none">
+						<input type="text" name="book-name" />
+						<button type="submit">Edit</button>
+					</form>
+				</td>
+				<td>
+					<button type="button" hx-delete={"/book/" + strconv.FormatInt(book.ID, 10) } hx-swap="none">Delete</button>
 				</td>
 			</tr>
 		}
@@ -54,10 +60,8 @@ templ BookTableComponent (books []database.Book) {
 
 templ BookInsertFormComponent () {
 	<form hx-post="/book" hx-swap="none">
-		<div id="name">
-			<label for="book-name">Name:</label>
-			<input type="text" name="book-name" />
-		</div>
+		<label for="book-name">Name:</label>
+		<input type="text" name="book-name" />
 		<button type="submit">Add new Book</button>
 	</form>
 }

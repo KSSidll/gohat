@@ -18,6 +18,7 @@ type route struct {
 	pattern *regexp.Regexp
 	innerHandler handlerFunc
 	paramKeys []string
+	verbose bool
 }
 
 type router struct {
@@ -30,15 +31,19 @@ func NewRouter() *router {
 
 func (r *route) handler(w http.ResponseWriter, req *http.Request) {
 	requestString := fmt.Sprint(req.Method, " ", req.URL)
-	fmt.Println("Recieved ", requestString)
+	if r.verbose {
+		fmt.Println("Recieved ", requestString)
+	}
 	start := time.Now()
 	nw := NewResponseWriter(w)
 	r.innerHandler(nw, req)
 	nw.Time = time.Since(start).Milliseconds()
-	fmt.Printf("%s resolved with %s\n", requestString, nw)
+	if r.verbose {
+		fmt.Printf("%s resolved with %s\n", requestString, nw)
+	}
 }
 
-func (r *router) addRoute(method, endpoint string, handler handlerFunc) {
+func (r *router) addRoute(method, endpoint string, handler handlerFunc, verbose bool) {
 	pathParamPattern := regexp.MustCompile(":([a-z]+)")
 	matches := pathParamPattern.FindAllStringSubmatch(endpoint, -1)
 	paramKeys := []string{}
@@ -51,15 +56,27 @@ func (r *router) addRoute(method, endpoint string, handler handlerFunc) {
 		}
 	}
 
-	route := route { method, regexp.MustCompile("^" + endpoint + "$"), handler, paramKeys }
+	route := route { method, regexp.MustCompile("^" + endpoint + "$"), handler, paramKeys, verbose }
 	r.routes = append(r.routes, route)
 }
 
-func (r *router) GET(pattern string, handler handlerFunc) {
-	r.addRoute(http.MethodGet, pattern, handler)
+func (r *router) GET(pattern string, handler handlerFunc, verbose bool) {
+	r.addRoute(http.MethodGet, pattern, handler, verbose)
 }
 
-func (r *router) ServeHTTP(w http.ResponseWriter, req *http. Request) {
+func (r *router) POST(pattern string, handler handlerFunc, verbose bool) {
+	r.addRoute(http.MethodPost, pattern, handler, verbose)
+}
+
+func (r *router) DELETE(pattern string, handler handlerFunc, verbose bool) {
+	r.addRoute(http.MethodDelete, pattern, handler, verbose)
+}
+
+func (r *router) PUT(pattern string, handler handlerFunc, verbose bool) {
+	r.addRoute(http.MethodPut, pattern, handler, verbose)
+}
+
+func (r *router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var allow []string
 	for _, route := range r.routes {
 		matches := route.pattern.FindStringSubmatch(req.URL.Path)

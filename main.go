@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	server.Serve()
+	server.Serve("8080")
 	os.Exit(1)
 }

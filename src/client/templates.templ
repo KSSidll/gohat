@@ -1,0 +1,86 @@
+package client
+
+import (
+	"strconv"
+
+	"github.com/KSSidll/gohat/src/database"
+)
+
+templ PageSkeleton(title string, body templ.Component) {
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>{ title }</title>
+			<script src="/assets/js/htmx.min.js"></script>
+			<link href="/assets/css/main.min.css" rel="stylesheet"/>
+		</head>
+		<body>
+			@body
+		</body>
+	</html>
+}
+
+templ IndexPage() {
+	@PageSkeleton("Index", IndexContent())
+}
+
+templ IndexContent () {
+	<div class="p-6 max-w-3xl mx-auto rounded-md shadow-sm grid grid-cols-1 space-x-4">
+		<div class="pb-4 mx-auto">
+			@BookInsertFormComponent()
+		</div>
+		<div>
+			// BookTableComponent
+			<div class="w-fit mx-auto" hx-get="/book/all" hx-trigger="load, newBook from:body, updateBook from:body, deleteBook from:body"></div>
+		</div>
+	</div>
+}
+
+templ BookTableComponent (books []database.Book) {
+	<table class="border-collapse border border-slate-500">
+		<tr>
+			<th class="p-2 border border-slate-500">ID</th>
+			<th class="p-2 border border-slate-500">Name</th>
+		</tr>
+		for _, book := range(books) {
+			<tr>
+				<td class="p-2 border border-slate-500">{ strconv.FormatInt(book.ID, 10) }</td>
+				<td class="p-2 border border-slate-500 max-w-xs line-clamp-2 !table-cell">{ book.Name }</td>
+				<td class="p-2 border border-slate-500">
+					<form
+						class="flex"
+						hx-put={ "/book/" + strconv.FormatInt(book.ID, 10) }
+						hx-swap="none"
+					>
+						<input
+							type="text"
+							name="book-name"
+							class="p-1 border-b border-slate-300 focus:outline-none focus:border-b focus:border-slate-400"
+						/>
+						<button
+							type="submit"
+							class="bg-slate-300 hover:bg-slate-400 rounded-xl ps-3 pe-3 pt-1 pb-1"
+						>
+							Edit
+						</button>
+					</form>
+				</td>
+				<td class="bg-red-400 hover:bg-red-600 border border-slate-500">
+					<button class="p-2" type="button" hx-delete={ "/book/" + strconv.FormatInt(book.ID, 10) } hx-swap="none">Delete</button>
+				</td>
+			</tr>
+		}
+	</table>
+}
+
+templ BookInsertFormComponent () {
+	<form hx-post="/book" hx-swap="none" class="flex items-center">
+		<label for="book-name" class="pe-2">Name:</label>
+		<input type="text" name="book-name" class="p-3 border rounded-md focus:outline focus:outline-2 focus:outline-slate-400"/>
+		<div class="ps-2">
+			<button type="submit" class="p-3 border rounded-lg bg-slate-300 hover:bg-slate-400">Add new Book</button>
+		</div>
+	</form>
+}

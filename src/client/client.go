@@ -3,8 +3,8 @@ package client
 import (
 	"net/http"
 
-	"github.com/KSSidll/gohat/database"
-	"github.com/KSSidll/gohat/server/routing"
+	"github.com/KSSidll/gohat/src/database"
+	"github.com/KSSidll/gohat/src/server/routing"
 	"github.com/a-h/templ"
 )
 

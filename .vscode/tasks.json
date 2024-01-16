@@ -1,0 +1,48 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build",
+            "command": "go",
+            "type": "shell",
+            "args": [
+                "build",
+                "-o",
+                "./build/main.exe",
+                "./src/main.go"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "Templ generate",
+                "Generate tailwind"
+            ]
+        },
+        {
+            "label": "Templ generate",
+            "command": "templ",
+            "type": "shell",
+            "args": [
+                "generate",
+                "."
+            ],
+            "group": "build"
+        },
+        {
+            "label": "Generate tailwind",
+            "command": "npx",
+            "type": "shell",
+            "args": [
+                "tailwindcss",
+                "-i",
+                "./src/assets/css/main-tailwind.css",
+                "-o",
+                "./src/assets/css/main.min.css",
+                "--minify",
+            ],
+            "group": "build"
+        },
+    ],
+}

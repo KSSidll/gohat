@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/KSSidll/gohat/server"
+	"github.com/KSSidll/gohat/src/server"
 )
 
 func main() {

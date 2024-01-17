@@ -54,6 +54,7 @@ make
 
 with one of arguments:
 ```
+all           generate templ and css then build a binary and run local project
 build         build a binary
 start         build and run local project
 css           build tailwindcss

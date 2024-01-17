@@ -8,12 +8,16 @@ help: Makefile
 	@echo
 	@echo " Choose a make command to run"
 	@echo
+	@echo "all          generate templ and css then build a binary and run local project"
 	@echo "build        build a binary"
 	@echo "run          build and run local project"
 	@echo "templ        generate templ templates"
 	@echo "css          build tailwindcss"
 	@echo "css-watch    watch build tailwindcss"
 	@echo
+
+.PHONY: all
+all: templ css build run
 
 .PHONY: build
 build:

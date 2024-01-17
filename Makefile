@@ -20,7 +20,7 @@ build:
 	go build -v -o ./build/main.exe ./src/main.go
 
 .PHONY: run
-start: build
+run: build
 	./build/main.exe
 
 .PHONY: templ
